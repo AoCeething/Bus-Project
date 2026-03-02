@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Departures</title>
+  <style>
+    :root{
+      --bg:#0b0b0c;
+      --card:#141416;
+      --text:#f2f2f3;
+      --muted:#a7a7ad;
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    header{
+      padding:18px 18px 10px;
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:12px;
+    }
+    header h1{
+      margin:0;
+      font-size:18px;
+      letter-spacing:0.2px;
+      font-weight:650;
+    }
+    header .meta{
+      font-size:13px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    main{
+      padding:0 18px 18px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:14px;
+    }
+    @media (min-width: 900px){
+      main{ grid-template-columns: 1fr 1fr; }
+    }
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,0.06);
+    }
+    .card .title{
+      padding:12px 14px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      border-bottom:1px solid rgba(255,255,255,0.06);
+    }
+    .card .title b{ font-size:14px; }
+    .card .title a{
+      color:var(--muted);
+      font-size:12px;
+      text-decoration:none;
+    }
+    .card .title a:hover{ text-decoration:underline; }
+    iframe{
+      width:100%;
+      height:560px;
+      border:0;
+      background:#fff;
+    }
+    /* Portrait tablets: make iframes taller */
+    @media (max-width: 500px){
+      iframe{ height:640px; }
+    }
+    footer{
+      padding:0 18px 18px;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .pill{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,0.06);
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Departures</h1>
+    <div class="meta">
+      <span class="pill" id="clock">--:--</span>
+      <span class="pill" id="status">Refreshing…</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="title">
+        <b>Bus — Stop 1352 (Camden St Lower)</b>
+        <a href="https://journeyplanner-production.transportforireland.ie/departures?stopId=8220DB001352&wrapper=false" target="_blank" rel="noopener">open</a>
+      </div>
+      <iframe id="bus"
+        src="https://journeyplanner-production.transportforireland.ie/departures?stopId=8220DB001352&wrapper=false"
+        loading="eager"></iframe>
+    </section>
+
+    <section class="card">
+      <div class="title">
+        <b>Luas — Charlemont</b>
+        <a href="https://citymapper.com/dublin/tram/stops/DublinStation_Charlemont?lang=en" target="_blank" rel="noopener">open</a>
+      </div>
+      <iframe id="luas"
+        src="https://citymapper.com/dublin/tram/stops/DublinStation_Charlemont?lang=en"
+        loading="eager"></iframe>
+    </section>
+  </main>
+
+  <footer>
+    Tip: If either panel is blank, that site may block embedding. In that case use the “open” links,
+    or switch to an API-based dashboard.
+  </footer>
+
+  <script>
+    // update clock
+    function tick(){
+      const d = new Date();
+      const hh = String(d.getHours()).padStart(2,'0');
+      const mm = String(d.getMinutes()).padStart(2,'0');
+      document.getElementById('clock').textContent = `${hh}:${mm}`;
+    }
+    tick(); setInterval(tick, 1000);
+
+    // refresh iframes every 60s
+    const REFRESH_MS = 60_000;
+    function refresh(){
+      document.getElementById('status').textContent = 'Refreshing…';
+      const bus = document.getElementById('bus');
+      const luas = document.getElementById('luas');
+
+      // force reload by resetting src
+      bus.src = bus.src;
+      luas.src = luas.src;
+
+      setTimeout(() => {
+        document.getElementById('status').textContent = 'Live';
+      }, 1500);
+    }
+    setInterval(refresh, REFRESH_MS);
+    setTimeout(() => document.getElementById('status').textContent = 'Live', 1500);
+  </script>
+</body>
+</html>
